@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "417546616823",
+    "project_id": "ecar-booking-mobile",
+    "storage_bucket": "ecar-booking-mobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:417546616823:android:4da60120bc757df682b8f2",
+        "android_client_info": {
+          "package_name": "com.example.ecar_booking_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "417546616823-c3tbcngnmubfa9q861m7eph9po4duqnr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.ecar_booking_mobile",
+            "certificate_hash": "e283c650e83c59f40a993a3e2c40756f36c464dd"
+          }
+        },
+        {
+          "client_id": "417546616823-gbmkgggueqf0emtdonmcn91mqi2cgnmu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWFk5Qk6FgesVR9nRDX9oBaic9SYwCOqo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "417546616823-gbmkgggueqf0emtdonmcn91mqi2cgnmu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
