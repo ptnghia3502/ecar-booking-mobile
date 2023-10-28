@@ -3,20 +3,21 @@ import 'package:ecar_booking_mobile/pages/main_pages/profile_pages/version_page.
 import 'package:flutter/material.dart';
 import 'package:ecar_booking_mobile/services/authentication_api.dart';
 
+import '../../services/local_variables.dart';
 import '../login_page.dart';
 import 'profile_pages/profile_details_page.dart';
 
 class ProfilePage extends StatelessWidget {
   void handleLogout(BuildContext context) {
     // Clear static variables
-    AuthenticationApi.jwtToken = '';
-    AuthenticationApi.currentEmail = '';
-    AuthenticationApi.currentUserId = '';
-    AuthenticationApi.currentUserName = '';
-
+    LocalVariables.jwtToken = '';
+    LocalVariables.currentEmail = '';
+    LocalVariables.currentUserId = '';
+    LocalVariables.currentUserName = '';
     // Navigate to the login page
-    Navigator.of(context).pushReplacement(
+    Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (context) => LoginPage()),
+      (route) => false, // This clears all previous routes
     );
   }
 
@@ -74,7 +75,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    AuthenticationApi.currentUserName,
+                    LocalVariables.currentUserName,
                     style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -83,7 +84,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    AuthenticationApi.currentEmail,
+                    LocalVariables.currentEmail,
                     style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.normal,

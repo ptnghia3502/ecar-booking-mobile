@@ -1,11 +1,10 @@
-import 'package:ecar_booking_mobile/services/authentication_api.dart';
+import 'package:ecar_booking_mobile/services/local_variables.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+import 'package:ecar_booking_mobile/models/order_model.dart';
+import 'package:ecar_booking_mobile/services/api_services.dart';
 import 'package:intl/intl.dart';
-
-import '../../models/order_model.dart';
-import '../../services/api_services.dart';
-import 'order_pages/order_details_page.dart'; // Import your API service
+import 'package:ecar_booking_mobile/services/authentication_api.dart';
+import 'order_pages/order_details_page.dart';
 
 class HistoryPage extends StatefulWidget {
   @override
@@ -14,7 +13,7 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   int _selectedTabIndex = 0;
-  List<Order> orders = []; // Store orders here
+  List<Order> orders = [];
 
   @override
   void initState() {
@@ -24,18 +23,18 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   // Function to fetch orders
-  void _fetchOrders() {
-    final customerId = AuthenticationApi.currentUserId; // Your customer ID
+  Future<void> _fetchOrders() async {
+    try {
+      final customerId = LocalVariables.currentUserId;
+      final data = await ApiService.getOrdersForCustomer(customerId);
 
-    ApiService.getOrdersForCustomer(customerId).then((data) {
-      print("Received ${data.length} orders from the API."); // Debug print
       setState(() {
         orders = data;
       });
-    }).catchError((error) {
+    } catch (error) {
       print("API call error: $error"); // Debug print
       // Handle error here
-    });
+    }
   }
 
   List<Order> getHistoryOrders() {
@@ -131,183 +130,188 @@ class _HistoryPageState extends State<HistoryPage> {
               child: TabBarView(
                 children: [
                   // FIRST TAB
-                  ListView.builder(
-                    itemCount: getHistoryOrders().length,
-                    // separatorBuilder: (context, index) =>
-                    //     const Divider(), // Add a divider between items
-                    itemBuilder: (context, index) {
-                      final order = getHistoryOrders()[index];
+                  orders.isEmpty
+                      ? const Center(
+                          child: Text("You dont have any orders!"),
+                        )
+                      : ListView.builder(
+                          itemCount: getHistoryOrders().length,
+                          itemBuilder: (context, index) {
+                            final order = getHistoryOrders()[index];
 
-                      final formattedDate =
-                          DateFormat('dd-MM-yyyy').format(order.creationDate);
-                      final formattedStartHour =
-                          DateFormat('HH:mm').format(order.creationDate);
+                            final formattedDate = DateFormat('dd-MM-yyyy')
+                                .format(order.creationDate);
+                            final formattedStartHour =
+                                DateFormat('HH:mm').format(order.creationDate);
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  OrderDetailsPage(order: order),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(
-                              10.0), // Add some gap between items
-                          decoration: BoxDecoration(
-                            color: Colors.white, // White background
-                            borderRadius: BorderRadius.circular(
-                                10.0), // Add border radius
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 3,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        OrderDetailsPage(order: order),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 3,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.all(16.0),
+                                  leading: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Image.asset(
+                                          'lib/assets/images/ticket.png'),
+                                    ],
+                                  ),
+                                  title: Text(
+                                    order.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.date_range),
+                                          Text('Started Date: $formattedDate'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.access_time),
+                                          Text(
+                                              'Start Hour: $formattedStartHour'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                              Icons.attach_money_rounded),
+                                          Text('Total: ${order.total}'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.payment_sharp),
+                                          Text('Payment: ${order.status}'),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                ),
                               ),
-                            ],
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(
-                                16.0), // Add padding to the ListTile
-                            leading: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Image.asset('lib/assets/images/ticket.png'),
-                              ],
-                            ),
-                            title: Text(
-                              order.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.date_range),
-                                    Text('Started Date: $formattedDate'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.access_time),
-                                    Text('Start Hour: $formattedStartHour'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.attach_money_rounded),
-                                    Text('Total: ${order.total}'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.payment_sharp),
-                                    Text('Payment: ${order.status}'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            // Add more details as needed
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
 
                   // Second tab: List of current items
-                  ListView.builder(
-                    itemCount: getFutureOrders().length,
-                    itemBuilder: (context, index) {
-                      final order = getFutureOrders()[index];
+                  orders.isEmpty
+                      ? const Center(
+                          child: Text("You dont have any orders!"),
+                        )
+                      : ListView.builder(
+                          itemCount: getFutureOrders().length,
+                          itemBuilder: (context, index) {
+                            final order = getFutureOrders()[index];
 
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  OrderDetailsPage(order: order),
-                            ),
-                          );
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.all(
-                              10.0), // Add some gap between items
-                          decoration: BoxDecoration(
-                            color: Colors.white, // White background
-                            borderRadius: BorderRadius.circular(
-                                10.0), // Add border radius
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.5),
-                                spreadRadius: 3,
-                                blurRadius: 7,
-                                offset: const Offset(0, 3),
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        OrderDetailsPage(order: order),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.all(10.0),
+                                decoration: BoxDecoration(
+                                  color: Colors.white, // White background
+                                  borderRadius: BorderRadius.circular(10.0),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.5),
+                                      spreadRadius: 3,
+                                      blurRadius: 7,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: ListTile(
+                                  contentPadding: const EdgeInsets.all(16.0),
+                                  leading: Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Image.asset(
+                                          'lib/assets/images/ticket.png'),
+                                    ],
+                                  ),
+                                  title: Text(
+                                    order.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.orange,
+                                    ),
+                                  ),
+                                  subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.date_range),
+                                          Text(
+                                              'Started Date: ${DateFormat('dd-MM-yyyy').format(order.creationDate)}'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.access_time),
+                                          Text(
+                                              'Start Hour: ${DateFormat('HH:mm').format(order.creationDate)}'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(
+                                              Icons.attach_money_rounded),
+                                          Text('Total: ${order.total}'),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          const Icon(Icons.payment_sharp),
+                                          Text('Payment: ${order.status}'),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  trailing: const Icon(Icons.arrow_forward_ios),
+                                ),
                               ),
-                            ],
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.all(
-                                16.0), // Add padding to the ListTile
-                            leading: Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                Image.asset('lib/assets/images/ticket.png'),
-                              ],
-                            ),
-                            title: Text(
-                              order.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    const Icon(Icons.date_range),
-                                    Text(
-                                        'Started Date: ${DateFormat('dd-MM-yyyy').format(order.creationDate)}'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.access_time),
-                                    Text(
-                                        'Start Hour: ${DateFormat('HH:mm').format(order.creationDate)}'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.attach_money_rounded),
-                                    Text('Total: ${order.total}'),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    const Icon(Icons.payment_sharp),
-                                    Text('Payment: ${order.status}'),
-                                  ],
-                                ),
-                              ],
-                            ),
-                            trailing: const Icon(Icons.arrow_forward_ios),
-                            // Add more details as needed
-                          ),
+                            );
+                          },
                         ),
-                      );
-                    },
-                  )
                 ],
               ),
             ),

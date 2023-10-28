@@ -1,3 +1,4 @@
+import 'package:ecar_booking_mobile/services/authentication_api.dart';
 import 'package:flutter/material.dart';
 import 'package:ecar_booking_mobile/services/api_services.dart';
 import 'package:ecar_booking_mobile/models/customer_model.dart';
@@ -24,7 +25,7 @@ class _ProfileDetailsPageState extends State<ProfileDetailsPage> {
 
   Future<void> _fetchCustomerDetails() async {
     try {
-      final fetchedCustomer = await ApiService.getCustomerDetails();
+      final fetchedCustomer = await AuthenticationApi.getCustomerDetails();
       setState(() {
         customer = fetchedCustomer;
         _nameController.text = customer!.name ?? 'N/A';

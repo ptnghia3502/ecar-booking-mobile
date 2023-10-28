@@ -11,10 +11,6 @@ class OrderDetailsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ApiService.getTripById(order.tickets[0].tripId).then((tripData) {
-      final currentRouteId = tripData.route.id;
-    });
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
@@ -166,7 +162,7 @@ class OrderDetailsPage extends StatelessWidget {
                           color: Colors.white), // Icon for date of birth
                       const SizedBox(width: 8),
                       Text(
-                        'Date of Birth: ${DateFormat('dd-MM-yyyy').format(DateTime.parse(order.customer.dateOfBirth!))}',
+                        'Date of Birth: ${order.customer.dateOfBirth != null ? DateFormat('dd-MM-yyyy').format(DateTime.parse(order.customer.dateOfBirth!)) : 'N/A'}',
                         style: const TextStyle(color: Colors.white),
                       ),
                     ],
@@ -243,7 +239,7 @@ class OrderDetailsPage extends StatelessWidget {
                       const Icon(Icons.monetization_on_outlined,
                           color: Colors.white), // Icon for phone number
                       const SizedBox(width: 8),
-                      Text('Creation Date: ${order.total}',
+                      Text('Total Price: ${order.total}',
                           style: const TextStyle(color: Colors.white)),
                     ],
                   ),
@@ -277,15 +273,19 @@ class OrderDetailsPage extends StatelessWidget {
                   } else {
                     final currentRouteId = snapshot.data;
 
+                    if (currentRouteId == null) {
+                      // Handle the case where currentRouteId is null.
+                      return const Text('Route ID not available');
+                    }
+
                     return ElevatedButton(
                       onPressed: () {
-                        RouteDetailDialog.show(context, currentRouteId!);
+                        RouteDetailDialog.show(context, currentRouteId);
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Colors.orangeAccent, // Text color
-                        minimumSize: const Size(
-                            double.infinity, 48), // Make button full-width
+                        backgroundColor: Colors.orangeAccent,
+                        minimumSize: const Size(double.infinity, 48),
                       ),
                       child: const Text(
                         'View Route Details',

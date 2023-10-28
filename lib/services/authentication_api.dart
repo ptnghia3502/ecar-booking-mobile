@@ -3,14 +3,11 @@ import 'dart:convert';
 
 import '../models/customer_model.dart';
 import '../models/registration_model.dart';
+import 'local_variables.dart';
 
 class AuthenticationApi {
   static const String baseUrl = 'http://14.187.99.91:4202/api';
   static const String baseUrl2 = 'http://14.187.99.91:4201/api';
-  static String jwtToken = '';
-  static String currentEmail = '';
-  static String currentUserId = '';
-  static String currentUserName = '';
 
   static Future<Map<String, dynamic>> login(
       String email, String password) async {
@@ -33,7 +30,7 @@ class AuthenticationApi {
       final Map<String, dynamic> responseBody = json.decode(response.body);
 
       // Parse and store the token and user information
-      jwtToken = responseBody['token'];
+      LocalVariables.jwtToken = responseBody['token'];
 
       return responseBody;
     } else {
@@ -68,16 +65,16 @@ class AuthenticationApi {
       customerDetailsUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
     if (response.statusCode == 200) {
       final dynamic customerData = json.decode(response.body);
 
-      currentEmail = customerData['email'];
-      currentUserId = customerData['id'];
-      currentUserName = customerData['name'];
+      LocalVariables.currentEmail = customerData['email'];
+      LocalVariables.currentUserId = customerData['id'];
+      LocalVariables.currentUserName = customerData['name'];
 
       return Customer.fromJson(customerData);
     } else {

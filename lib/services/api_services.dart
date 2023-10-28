@@ -10,10 +10,11 @@ import '../models/route_model.dart';
 import '../models/trip_model.dart';
 import '../models/vehicle_model.dart';
 import '../models/provider_model.dart';
+import 'local_variables.dart';
 
 class ApiService {
   static const String baseUrl = 'http://14.187.99.91:4201/api';
-  static String jwtToken = AuthenticationApi.jwtToken;
+  //static String jwtToken = AuthenticationApi.jwtToken;
 
   // get all trips
   static Future<List<Trip>> getTrips() async {
@@ -23,7 +24,7 @@ class ApiService {
       tripsUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -43,7 +44,7 @@ class ApiService {
       tripUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -63,7 +64,7 @@ class ApiService {
       customerDetailsUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -85,7 +86,7 @@ class ApiService {
       updateCustomerUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
       body: jsonEncode(customerData),
     );
@@ -105,7 +106,7 @@ class ApiService {
       vehicleUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -125,7 +126,7 @@ class ApiService {
       providerUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -145,7 +146,7 @@ class ApiService {
       providerUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -167,7 +168,7 @@ class ApiService {
       routeLocationsUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -190,7 +191,7 @@ class ApiService {
       ordersUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -210,7 +211,7 @@ class ApiService {
       orderUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
@@ -249,7 +250,7 @@ class ApiService {
       orderUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
       body: jsonEncode(orderDto.toJson()),
     );
@@ -272,7 +273,7 @@ class ApiService {
       orderUrl,
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer $jwtToken',
+        'Authorization': 'Bearer ${LocalVariables.jwtToken}',
       },
     );
 
