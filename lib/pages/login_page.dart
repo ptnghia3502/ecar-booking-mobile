@@ -1,3 +1,4 @@
+import 'package:ecar_booking_mobile/utils/global_message.dart';
 import 'package:flutter/material.dart';
 import 'package:ecar_booking_mobile/services/authentication_api.dart';
 
@@ -13,69 +14,34 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController passwordController = TextEditingController();
   bool _obscurePassword = true;
 
+  late GlobalMessage globalMessage;
+
   Future<void> _handleLogin() async {
     final email = emailController.text;
     final password = passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
-      // If email or password is empty, show a warning
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Text(
-              'Login Failed',
-              style: TextStyle(color: Colors.red),
-            ),
-            content: const Text('Email and password are required.'),
-            actions: <Widget>[
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: const Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
+      globalMessage.showWarnMessage('Email and password are required.');
     } else {
       try {
         final result = await AuthenticationApi.login(email, password);
         final currentData = await AuthenticationApi.getCustomerDetails();
+        globalMessage.showLoading();
+        await Future.delayed(const Duration(seconds: 3));
         if (result != null && currentData != null) {
+          // ignore: use_build_context_synchronously
           Navigator.pushNamed(context, '/home');
         }
-        // Handle the successful login by navigating to the home screen
       } catch (e) {
-        // Handle login failure by showing an error message
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text(
-                'Login Failed',
-                style: TextStyle(color: Colors.red),
-              ),
-              content:
-                  const Text('Failed to login. Please check your credentials.'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
+        globalMessage.showErrorMessage(
+            'Failed to login. Please check your credentials.');
       }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    globalMessage = GlobalMessage(context);
     return Scaffold(
         backgroundColor: Colors.orangeAccent,
         body: DecoratedBox(

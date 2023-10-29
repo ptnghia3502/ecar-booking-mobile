@@ -7,6 +7,7 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:intl/intl.dart';
 
 import '../../../models/order_createdto_model.dart';
+import '../../../utils/global_message.dart';
 import 'components/provider_detail_dialog.dart';
 import 'components/route_detail_dialog.dart';
 import 'components/vehicle_detail_dialog.dart';
@@ -40,18 +41,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
   int selectedQuantity = 1;
   TextEditingController orderNameController = TextEditingController();
 
-  void showOrderDialog(BuildContext context) {
-    // Ensure that trip details are fetched before showing the dialog
-    if (tripName.isEmpty || price == 0 || seatRemain == 0) {
-      // Fetch the details and show the dialog when they are available
-      fetchTripDetails().then((_) {
-        _showOrderDialog(context);
-      });
-    } else {
-      // If details are already available, show the dialog immediately
-      _showOrderDialog(context);
-    }
-  }
+  late GlobalMessage globalMessage;
 
   void _showOrderDialog(BuildContext context) {
     showDialog(
@@ -60,37 +50,53 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: const Text('Create Order'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
+              title: const Text(
+                'Create Order',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.orange,
+                ),
+              ),
+              content: Row(
                 children: [
-                  Text(tripName),
-                  Text('Price: \$${price.toStringAsFixed(2)}'),
-                  Text('Available Seats: $seatRemain'),
-                  TextField(
-                    controller: orderNameController,
-                    decoration:
-                        const InputDecoration(labelText: 'Name your order'),
-                  ),
-                  Row(
-                    children: [
-                      const Text('Select Quantity: '),
-                      DropdownButton<int>(
-                        value: selectedQuantity,
-                        items: List.generate(seatRemain, (index) => index + 1)
-                            .map((quantity) {
-                          return DropdownMenuItem<int>(
-                            value: quantity,
-                            child: Text(quantity.toString()),
-                          );
-                        }).toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedQuantity = value!;
-                          });
-                        },
-                      ),
-                    ],
+                  Expanded(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment
+                          .start, // Align content to the start (left)
+                      children: [
+                        Text(tripName),
+                        Text('Price: \$${price.toStringAsFixed(2)}'),
+                        Text('Available Seats: $seatRemain'),
+                        TextField(
+                          controller: orderNameController,
+                          decoration: const InputDecoration(
+                              labelText: 'Name your order'),
+                        ),
+                        Row(
+                          children: [
+                            const Text('Select Quantity: '),
+                            DropdownButton<int>(
+                              value: selectedQuantity,
+                              items: List.generate(
+                                      seatRemain, (index) => index + 1)
+                                  .map((quantity) {
+                                return DropdownMenuItem<int>(
+                                  value: quantity,
+                                  child: Text(quantity.toString()),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedQuantity = value!;
+                                });
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -99,15 +105,26 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Cancel'),
+                  child: const Text(
+                    'Cancel',
+                    style: TextStyle(
+                      color: Colors.red,
+                    ),
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: () {
                     createOrder();
                     Navigator.of(context).pop();
                   },
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.orange),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                  ),
                   child: const Text('Create Order'),
-                ),
+                )
               ],
             );
           },
@@ -127,33 +144,21 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         ),
       ],
     );
+    //globalMessage.showConfirmMessage('Are you sure?');
 
     ApiService.createOrder(orderDto).then((response) {
       if (response.statusCode == 201) {
-        // Order creation successful
         final Map<String, dynamic> orderResponse = json.decode(response.body);
 
         if (orderResponse.containsKey("id")) {
           final String orderId = orderResponse["id"] as String;
-
-          // Handle order creation success
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Order created successfully.'),
-            ),
-          );
-
-          // Now use the orderId to make the createPayment API call
           ApiService.createPayment(orderId);
+          globalMessage.showSuccessMessage('Order created successfully!');
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Failed to retrieve orderId from the response.'),
-            ),
-          );
+          globalMessage.showErrorMessage('Fail to create your order!');
         }
       } else {
-        // Handle order creation failure
+        globalMessage.showErrorMessage('Something wrong!');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Failed to create order: ${response.statusCode}'),
@@ -161,7 +166,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         );
       }
     }).catchError((error) {
-      // Handle other errors, such as network issues
+      globalMessage.showErrorMessage('Something wrong!');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Error: $error'),
@@ -205,6 +210,7 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    globalMessage = GlobalMessage(context);
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,

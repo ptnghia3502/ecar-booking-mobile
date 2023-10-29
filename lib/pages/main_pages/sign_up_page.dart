@@ -2,7 +2,8 @@ import 'package:ecar_booking_mobile/pages/login_page.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/registration_model.dart';
-import '../../services/authentication_api.dart'; // Import your registration request model
+import '../../services/authentication_api.dart';
+import '../../utils/global_message.dart'; // Import your registration request model
 
 class SignUpPage extends StatefulWidget {
   @override
@@ -19,12 +20,21 @@ class _SignUpPageState extends State<SignUpPage> {
   final TextEditingController _nameController = TextEditingController();
 
   String _errorText = '';
+  late GlobalMessage globalMessage;
 
   @override
   Widget build(BuildContext context) {
+    globalMessage = GlobalMessage(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sign Up'),
+        backgroundColor: Colors.orange,
+        title: const Text(
+          'Sign Up',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -85,8 +95,14 @@ class _SignUpPageState extends State<SignUpPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _signUp,
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.orange),
+                    foregroundColor:
+                        MaterialStateProperty.all<Color>(Colors.white),
+                  ),
                   child: const Text('Sign Up'),
-                ),
+                )
               ],
             ),
           ),
@@ -169,11 +185,14 @@ class _SignUpPageState extends State<SignUpPage> {
       try {
         await AuthenticationApi.register(registrationRequest);
         // Registration successful, handle the response as needed
+        globalMessage.showSuccessMessage("Your account have been created!");
+        await Future.delayed(const Duration(seconds: 10));
         // ignore: use_build_context_synchronously
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => LoginPage()));
       } catch (e) {
         // Registration failed, handle the error
+        globalMessage.showErrorMessage("Something wrong, please try again!");
         setState(() {
           _errorText = 'Registration failed: $e';
         });
