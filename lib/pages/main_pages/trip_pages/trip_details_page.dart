@@ -151,8 +151,9 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
         final Map<String, dynamic> orderResponse = json.decode(response.body);
 
         if (orderResponse.containsKey("id")) {
-          final String orderId = orderResponse["id"] as String;
-          ApiService.createPayment(orderId);
+          // call api create payment
+          //final String orderId = orderResponse["id"] as String;
+          //ApiService.createPayment(orderId);
           globalMessage.showSuccessMessage('Order created successfully!');
         } else {
           globalMessage.showErrorMessage('Fail to create your order!');
@@ -385,7 +386,12 @@ class _TripDetailsPageState extends State<TripDetailsPage> {
                       ),
                       child: ElevatedButton(
                         onPressed: () {
-                          _showOrderDialog(context);
+                          if (status == "Active") {
+                            _showOrderDialog(context);
+                          } else {
+                            globalMessage
+                                .showErrorMessage("You can't buy this ticket");
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           foregroundColor: Colors.green[600],

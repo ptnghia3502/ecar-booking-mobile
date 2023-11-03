@@ -1,7 +1,6 @@
 import 'package:ecar_booking_mobile/pages/main_pages/profile_pages/change_pass_page.dart';
 import 'package:ecar_booking_mobile/pages/main_pages/profile_pages/version_page.dart';
 import 'package:flutter/material.dart';
-import 'package:ecar_booking_mobile/services/authentication_api.dart';
 
 import '../../services/local_variables.dart';
 import '../login_page.dart';

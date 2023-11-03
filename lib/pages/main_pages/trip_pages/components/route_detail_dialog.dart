@@ -19,7 +19,7 @@ class RouteDetailDialog {
           DataCell(Text('${location.index + 1}')),
           DataCell(
             Container(
-              width: 120, // Adjust the width to your preference
+              width: 100, // Adjust the width to your preference
               child: Text(location.name,
                   overflow: TextOverflow.ellipsis, maxLines: 2),
             ),
@@ -43,56 +43,58 @@ class RouteDetailDialog {
               ),
             ),
           ),
-          content: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image at the top center
-              const Center(child: image),
+          content: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image at the top center
+                const Center(child: image),
 
-              // Rest of the content
-              Container(
-                margin: const EdgeInsets.only(top: 20),
-                child: Text(
-                  route.name,
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 18),
+                // Rest of the content
+                Container(
+                  margin: const EdgeInsets.only(top: 20),
+                  child: Text(
+                    route.name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 18),
+                  ),
                 ),
-              ),
-              Text('Description: ${route.description}'),
+                Text('Description: ${route.description}'),
 
-              Container(
-                margin: const EdgeInsets.only(
-                    top: 20), // Adjust the value to set the desired margin
-                child: const Text(
-                  'Index Order of Route',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                Container(
+                  margin: const EdgeInsets.only(
+                      top: 20), // Adjust the value to set the desired margin
+                  child: const Text(
+                    'Index Order of Route',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  ),
                 ),
-              ),
 
-              DataTable(
-                columnSpacing: 20, // Adjust the spacing between columns
-                // ignore: deprecated_member_use
-                dataRowHeight: 70, // Adjust the row height as needed
-                columns: const <DataColumn>[
-                  DataColumn(
-                    label: Text('Index',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold)),
-                  ),
-                  DataColumn(
-                    label: Text('Location',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold)),
-                  ),
-                  DataColumn(
-                    label: Text('Type',
-                        style: TextStyle(
-                            fontSize: 14, fontWeight: FontWeight.bold)),
-                  ),
-                ],
-                rows: locationRows,
-              ),
-            ],
+                DataTable(
+                  columnSpacing: 20, // Adjust the spacing between columns
+                  // ignore: deprecated_member_use
+                  dataRowHeight: 70, // Adjust the row height as needed
+                  columns: const <DataColumn>[
+                    DataColumn(
+                      label: Text('Index',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
+                    ),
+                    DataColumn(
+                      label: Text('Location',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
+                    ),
+                    DataColumn(
+                      label: Text('Type',
+                          style: TextStyle(
+                              fontSize: 14, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                  rows: locationRows,
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(

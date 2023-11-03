@@ -1,7 +1,10 @@
 import 'package:ecar_booking_mobile/services/api_services.dart';
+import 'package:ecar_booking_mobile/utils/global_message.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../models/order_model.dart';
+import '../../../models/ticket_model.dart';
+import '../../../services/paypal_checkout_service.dart';
 import '../trip_pages/components/route_detail_dialog.dart';
 
 class OrderDetailsPage extends StatelessWidget {
@@ -9,8 +12,40 @@ class OrderDetailsPage extends StatelessWidget {
 
   OrderDetailsPage({required this.order});
 
+  // Function to initiate PayPal checkout and handle the payment result
+  Future<void> initiatePaypalCheckoutForTicket(
+    Ticket ticket,
+    BuildContext context,
+  ) async {
+    bool isSuccess = await PaypalCheckoutService.initiatePaypalCheckout(
+      context,
+      sandboxMode: true,
+      clientId:
+          "AayHcscHm9UCh2bVK3DQ2qxEgjBJPoYumEV_LsHb1ZrrcGfKrBCBja0L1XzttPC0DcD52_n08PQZKIPt",
+      secretKey:
+          "EAkNIpiHufzrV8qP1X0NcpXAsE3P24Gm7OhPJKWk0IEI2F-mRwlK1pgFNXVWDwZL9tR6TSRSwKna1uKg",
+      returnURL: "success.snippetcoder.com",
+      cancelURL: "cancel.snippetcoder.com",
+      itemName: ticket.name,
+      itemQuantity: ticket.quantity,
+      itemPrice: ticket.price,
+    );
+
+    if (isSuccess) {
+      await ApiService.createPayment(order.id);
+      // ignore: use_build_context_synchronously
+      GlobalMessage(context)
+          .showSuccessMessage("Your order has been purchased!");
+    } else {
+      // ignore: use_build_context_synchronously
+      GlobalMessage(context).showErrorMessage("Fail to purchase your order!");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool isNotCompleted = order.status != "Completed";
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
@@ -93,13 +128,22 @@ class OrderDetailsPage extends StatelessWidget {
                             ),
                           ],
                         ),
-                        // Total Price
                         Row(
                           children: [
                             const Icon(Icons.attach_money,
                                 color: Colors.white), // Icon
                             Text(
-                              'Total Price: ${ticket.price}',
+                              'Ticket Price: ${ticket.price}',
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.attach_money,
+                                color: Colors.white), // Icon
+                            Text(
+                              'Quantity: ${ticket.quantity}',
                               style: const TextStyle(color: Colors.white),
                             ),
                           ],
@@ -266,7 +310,9 @@ class OrderDetailsPage extends StatelessWidget {
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     // While waiting for the data to load, you can show a loading indicator.
-                    return const CircularProgressIndicator();
+                    return const Center(
+                      child: CircularProgressIndicator(),
+                    );
                   } else if (snapshot.hasError) {
                     // Handle errors here.
                     return Text('Error: ${snapshot.error}');
@@ -284,7 +330,7 @@ class OrderDetailsPage extends StatelessWidget {
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
-                        backgroundColor: Colors.orangeAccent,
+                        backgroundColor: Colors.red,
                         minimumSize: const Size(double.infinity, 48),
                       ),
                       child: const Text(
@@ -297,6 +343,52 @@ class OrderDetailsPage extends StatelessWidget {
                 },
               ),
             ),
+
+            // Add a conditional check for order status
+            if (isNotCompleted)
+              ElevatedButton(
+                onPressed: () async {
+                  // Call checkout service
+                  await initiatePaypalCheckoutForTicket(
+                      order.tickets[0], context);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange[300],
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                  padding: const EdgeInsets.all(8),
+                ),
+                child: Center(
+                  child: Image.asset(
+                    'lib/assets/images/paypal_logo.png',
+                    width: 150, // Set the logo's width
+                    height: 60, // Set the logo's height
+                  ),
+                ),
+              )
+            else
+              ElevatedButton(
+                onPressed: () {
+                  // Do nothing when pressed
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey[400], // Change the button color
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                child: const Text(
+                  'Your order has been purchased',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
           ],
         ),
       ),

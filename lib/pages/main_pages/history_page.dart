@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:ecar_booking_mobile/models/order_model.dart';
 import 'package:ecar_booking_mobile/services/api_services.dart';
 import 'package:intl/intl.dart';
-import 'package:ecar_booking_mobile/services/authentication_api.dart';
 import 'order_pages/order_details_page.dart';
 
 class HistoryPage extends StatefulWidget {
@@ -47,6 +46,14 @@ class _HistoryPageState extends State<HistoryPage> {
     return orders.where((order) => order.creationDate.isAfter(now)).toList();
   }
 
+  List<Order> getOrdersPaymentNotCompleted() {
+    return orders.where((order) => order.status == "Created").toList();
+  }
+
+  List<Order> getOrdersPaymentHaveDone() {
+    return orders.where((order) => order.status == "Completed").toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
@@ -60,7 +67,7 @@ class _HistoryPageState extends State<HistoryPage> {
             alignment: Alignment.center,
             padding: const EdgeInsets.all(16.0),
             child: const Text(
-              'Tickets List',
+              'Tickets & Orders List',
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 20,
@@ -106,7 +113,7 @@ class _HistoryPageState extends State<HistoryPage> {
                             : Colors.black,
                       ),
                       Text(
-                        'Future Trips',
+                        'Purchased',
                         style: TextStyle(
                           color: _selectedTabIndex == 1
                               ? Colors.orangeAccent
@@ -135,9 +142,9 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: Text("You dont have any orders!"),
                         )
                       : ListView.builder(
-                          itemCount: getHistoryOrders().length,
+                          itemCount: getOrdersPaymentNotCompleted().length,
                           itemBuilder: (context, index) {
-                            final order = getHistoryOrders()[index];
+                            final order = getOrdersPaymentNotCompleted()[index];
 
                             final formattedDate = DateFormat('dd-MM-yyyy')
                                 .format(order.creationDate);
@@ -229,9 +236,9 @@ class _HistoryPageState extends State<HistoryPage> {
                           child: Text("You dont have any orders!"),
                         )
                       : ListView.builder(
-                          itemCount: getFutureOrders().length,
+                          itemCount: getOrdersPaymentHaveDone().length,
                           itemBuilder: (context, index) {
-                            final order = getFutureOrders()[index];
+                            final order = getOrdersPaymentHaveDone()[index];
 
                             return GestureDetector(
                               onTap: () {

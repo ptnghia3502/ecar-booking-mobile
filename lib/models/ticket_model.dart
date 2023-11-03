@@ -4,6 +4,7 @@ class Ticket {
   final String name;
   final String orderId;
   final double price;
+  final int quantity;
 
   Ticket({
     required this.id,
@@ -11,6 +12,7 @@ class Ticket {
     required this.name,
     required this.orderId,
     required this.price,
+    required this.quantity,
   });
 
   factory Ticket.fromJson(Map<String, dynamic> json) {
@@ -20,6 +22,7 @@ class Ticket {
       name: json['name'],
       orderId: json['orderId'],
       price: json['price'].toDouble(),
+      quantity: json['quantity'],
     );
   }
 }
